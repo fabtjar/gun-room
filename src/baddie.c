@@ -2,7 +2,19 @@
 #include "raymath.h"
 #include <stdlib.h>
 
-Baddie *add_baddie(Baddie baddie[], Vector2 pos) {
+Baddie *add_baddie(Baddie baddie[]) {
+    int width = baddie[0].world->width;
+    int height = baddie[0].world->height;
+    Vector2 pos;
+
+    if (rand() % 2 == 0) {
+        pos.x = rand() % 2 == 0 ? 0 : width;
+        pos.y = rand() % height;
+    } else {
+        pos.y = rand() % 2 == 0 ? 0 : height;
+        pos.x = rand() % width;
+    }
+
     for (int i = 0; i < BADDIE_N; i++) {
         Baddie *b = &baddie[i];
         if (b->active) continue;

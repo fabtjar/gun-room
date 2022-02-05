@@ -14,7 +14,7 @@ typedef struct Baddie {
     bool active;
 } Baddie;
 
-Baddie *add_baddie(Baddie baddie[], Vector2 pos);
+Baddie *add_baddie(Baddie baddie[]);
 
 void update_baddies(Baddie baddies[], float dt);
 
