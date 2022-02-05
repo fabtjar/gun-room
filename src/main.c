@@ -24,9 +24,8 @@ bool is_touching(Vector2 a, Vector2 b);
 
 int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(WIDTH, HEIGHT, "Gun Room");
+    InitWindow(WIDTH * SCALE, HEIGHT * SCALE, "Gun Room");
     SetWindowMinSize(WIDTH, HEIGHT);
-    SetWindowSize(WIDTH * SCALE, HEIGHT * SCALE);
 
     RenderTexture2D renderTexture = LoadRenderTexture(WIDTH, HEIGHT);
 
@@ -100,7 +99,7 @@ int main(void) {
         }
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-        
+
         sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
 
         BeginTextureMode(renderTexture);
