@@ -5,7 +5,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/raylib)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(gun_room src/main.c)
+add_executable(gun_room src/main.c src/world.h src/player.c src/player.h src/math_utils.c src/math_utils.h src/baddie.c src/baddie.h src/bullet.c src/bullet.h)
 
 target_link_libraries(gun_room raylib)
 

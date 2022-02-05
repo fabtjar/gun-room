@@ -1,20 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "math.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "world.h"
+#include "player.h"
+#include "baddie.h"
+#include "bullet.h"
 
 #define WIDTH 400
 #define HEIGHT 300
 #define SCALE 2
 
-#define PLAYER_SPEED 150
-#define PLAYER_DECEL 100
-#define BADDIE_N 100
-#define BADDIE_SPEED 80
-#define PLAYER_DECEL 100
-#define BULLET_N 20
-#define BULLET_SPEED 500
 #define SHOOT_DELAY 0.1
 #define COIN_MIN_DIST 100
 #define COIN_EDGE_GAP 50
@@ -22,50 +18,9 @@
 
 #define DEBUG_TEXT_N 1000
 
-typedef struct World {
-    int width;
-    int height;
-} World;
-
-typedef struct Player {
-    World *world;
-    Vector2 pos;
-    Vector2 vel;
-    float angle;
-    bool is_shooting;
-    double shoot_timer;
-    int frame;
-} Player;
-
-typedef struct Baddie {
-    World *world;
-    Vector2 pos;
-    Vector2 vel;
-    bool active;
-} Baddie;
-
-typedef struct Bullet {
-    World *world;
-    Vector2 pos;
-    Vector2 vel;
-    bool active;
-} Bullet;
-
-void update_player(Player *player, float dt);
-
-Baddie *add_baddie(Baddie baddie[], Vector2 pos);
-
-void update_baddies(Baddie baddies[], float dt);
-
-Bullet *add_bullet(Bullet bullets[], Vector2 pos, float angle);
-
-void update_bullets(Bullet bullets[], float dt);
-
 void move_coin(Vector2 *coin_pos, Vector2 player_pos);
 
 bool is_touching(Vector2 a, Vector2 b);
-
-float approach(float t, float target, float delta);
 
 int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT);
@@ -159,26 +114,11 @@ int main(void) {
         {
             ClearBackground(WHITE);
             DrawTextureTiled(bg_texture, grid_rect, game_rect, (Vector2) {0, 0}, 0, 1, WHITE);
-
             DrawTexture(coin_texture, coin_pos.x - 12, coin_pos.y - 12, WHITE);
 
-            for (int i = 0; i < BADDIE_N; i++) {
-                Baddie b = baddies[i];
-                if (!b.active) continue;
-                src_rect = (Rectangle) {0, 0, 32, 32};
-                dest_rect = (Rectangle) {b.pos.x, b.pos.y, 32, 32};
-                float angle = Vector2Angle(Vector2Zero(), b.vel);
-                DrawTexturePro(baddie_texture, src_rect, dest_rect, grid_middle, angle * RAD2DEG, WHITE);
-            }
-
-            for (int i = 0; i < BULLET_N; i++) {
-                Bullet b = bullets[i];
-                if (b.active) DrawTexture(bullet_texture, b.pos.x - 10, b.pos.y - 10, WHITE);
-            }
-
-            src_rect = (Rectangle) {player.frame * 32, 0, 32, 32};
-            dest_rect = (Rectangle) {player.pos.x, player.pos.y, 32, 32};
-            DrawTexturePro(player_texture, src_rect, dest_rect, grid_middle, player.angle * RAD2DEG, WHITE);
+            draw_baddies(baddies, baddie_texture);
+            draw_bullets(bullets, bullet_texture);
+            draw_player(&player, player_texture);
 
             DrawText(debug_text, 4, 4, 20, BLACK);
         }
@@ -204,94 +144,6 @@ int main(void) {
     return 0;
 }
 
-void update_player(Player *player, float dt) {
-    player->vel.x = approach(player->vel.x, 0, PLAYER_DECEL * dt);
-    player->vel.y = approach(player->vel.y, 0, PLAYER_DECEL * dt);
-
-    Vector2 dir = {0, 0};
-    if (IsKeyDown(KEY_LEFT)) dir.x--;
-    if (IsKeyDown(KEY_RIGHT)) dir.x++;
-    if (IsKeyDown(KEY_UP)) dir.y--;
-    if (IsKeyDown(KEY_DOWN)) dir.y++;
-
-    player->is_shooting = IsKeyDown(KEY_Z);
-
-    if (dir.x != 0 || dir.y != 0) {
-        if (!player->is_shooting) player->vel = Vector2Scale(Vector2Normalize(dir), PLAYER_SPEED);
-        player->angle = Vector2Angle(Vector2Zero(), dir);
-    }
-
-    player->pos.x += player->vel.x * dt;
-    player->pos.y += player->vel.y * dt;
-
-    if (player->pos.x < 0) player->pos.x = 0;
-    else if (player->pos.x > WIDTH) player->pos.x = WIDTH;
-    if (player->pos.y < 0) player->pos.y = 0;
-    else if (player->pos.y > HEIGHT) player->pos.y = HEIGHT;
-
-    player->frame = player->is_shooting ? 1 : 0;
-}
-
-Baddie *add_baddie(Baddie baddie[], Vector2 pos) {
-    for (int i = 0; i < BADDIE_N; i++) {
-        Baddie *b = &baddie[i];
-        if (b->active) continue;
-        b->active = true;
-        b->pos = pos;
-        Vector2 middle = (Vector2) {b->world->width / 2, b->world->height / 2};
-        Vector2 dist = Vector2Subtract(middle, b->pos);
-        Vector2 normal = Vector2Normalize(dist);
-        b->vel = Vector2Scale(normal, BADDIE_SPEED);
-        return b;
-    }
-    return NULL;
-}
-
-void update_baddies(Baddie baddies[], float dt) {
-    for (int i = 0; i < BADDIE_N; i++) {
-        Baddie *b = &baddies[i];
-        if (!b->active) continue;
-        b->pos = Vector2Add(b->pos, Vector2Scale(b->vel, dt));
-        if (b->pos.x < 0) {
-            b->pos.x = 0;
-            b->vel.x *= -1;
-        } else if (b->pos.x > (float) b->world->width) {
-            b->pos.x = (float) b->world->width;
-            b->vel.x *= -1;
-        }
-        if (b->pos.y < 0) {
-            b->pos.y = 0;
-            b->vel.y *= -1;
-        } else if (b->pos.y > (float) b->world->height) {
-            b->pos.y = (float) b->world->height;
-            b->vel.y *= -1;
-        }
-    }
-}
-
-Bullet *add_bullet(Bullet bullets[], Vector2 pos, float angle) {
-    for (int i = 0; i < BULLET_N; i++) {
-        Bullet *b = &bullets[i];
-        if (b->active) continue;
-        b->active = true;
-        b->pos = pos;
-        b->vel = Vector2Rotate((Vector2) {BULLET_SPEED, 0}, angle);
-        return b;
-    }
-    return NULL;
-}
-
-void update_bullets(Bullet bullets[], float dt) {
-    for (int i = 0; i < BULLET_N; i++) {
-        Bullet *b = &bullets[i];
-        if (!b->active) continue;
-        b->pos = Vector2Add(b->pos, Vector2Scale(b->vel, dt));
-        if (b->pos.x + 10 < 0 || b->pos.x - 10 > (float) b->world->width ||
-            b->pos.y + 10 < 0 || b->pos.y - 10 > (float) b->world->height)
-            b->active = false;
-    }
-}
-
 void move_coin(Vector2 *coin_pos, Vector2 player_pos) {
     *coin_pos = player_pos;
     while (Vector2Distance(*coin_pos, player_pos) < COIN_MIN_DIST) {
@@ -302,9 +154,4 @@ void move_coin(Vector2 *coin_pos, Vector2 player_pos) {
 
 bool is_touching(Vector2 a, Vector2 b) {
     return Vector2LengthSqr(Vector2Subtract(a, b)) < TOUCHING_DIST * TOUCHING_DIST;
-}
-
-
-float approach(float t, float target, float delta) {
-    return t < target ? fminf(t + delta, target) : fmaxf(t - delta, target);
 }
