@@ -7,8 +7,8 @@
 #include "baddie.h"
 #include "bullet.h"
 
-#define WIDTH 400
-#define HEIGHT 300
+#define WIDTH 480
+#define HEIGHT 270
 #define SCALE 2
 
 #define SHOOT_DELAY 0.1
