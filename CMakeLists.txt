@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.20)
+project(gun_room C)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/raylib)
+
+set(CMAKE_C_STANDARD 11)
+
+add_executable(gun_room src/main.c)
+
+target_link_libraries(gun_room raylib)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/content DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
