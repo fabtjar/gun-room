@@ -103,11 +103,7 @@ int main(void) {
         }
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-
-        int baddies_active = 0;
-        for (int i = 0; i < BADDIE_N; i++) {
-            if (baddies[i].active) baddies_active++;
-        }
+        
         sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
 
         BeginTextureMode(renderTexture);
