@@ -73,6 +73,8 @@ int main(void) {
         float dt = GetFrameTime();
 
         update_player(&player, dt);
+        update_baddies(baddies, dt);
+        update_bullets(bullets, dt);
 
         if (player.is_shooting && GetTime() > player.shoot_timer) {
             player.shoot_timer = GetTime() + SHOOT_DELAY;
@@ -80,10 +82,6 @@ int main(void) {
         }
 
         if (is_touching(player.pos, coin_pos)) move_coin(&coin_pos, player.pos);
-
-        update_baddies(baddies, dt);
-
-        update_bullets(bullets, dt);
 
         for (int i = 0; i < BULLET_N; i++) {
             Bullet *bullet = &bullets[i];
