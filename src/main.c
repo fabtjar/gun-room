@@ -98,8 +98,6 @@ int main(void) {
             }
         }
 
-        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-
         sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
 
         BeginTextureMode(renderTexture);
