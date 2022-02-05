@@ -40,9 +40,6 @@ int main(void) {
     Rectangle render_rect = {0, HEIGHT, WIDTH, -HEIGHT};
     Rectangle screen_rect = {0, 0, WIDTH * SCALE, HEIGHT * SCALE};
     Rectangle grid_rect = {0, 0, 32, 32};
-    Vector2 grid_middle = {grid_rect.width / 2, grid_rect.height / 2};
-    Rectangle src_rect;
-    Rectangle dest_rect;
 
     World world = {.width=WIDTH, .height=HEIGHT};
 
