@@ -70,6 +70,7 @@ void init() {
     player.world = &world;
     player.texture = &player_texture;
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
+    player.vel = Vector2Zero();
 
     for (int i = 0; i < BADDIE_N; i++) {
         baddies[i].world = &world;
@@ -131,7 +132,11 @@ void update() {
 
     sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
 
-    if (IsKeyPressed(KEY_SPACE)) add_baddie(baddies, player.pos);
+    if (IsKeyPressed(KEY_SPACE))
+        add_baddie(baddies, player.pos);
+
+    if (IsKeyPressed(KEY_R))
+        init();
 }
 
 
