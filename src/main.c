@@ -1,26 +1,22 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "raylib.h"
 #include "raymath.h"
 #include "world.h"
 #include "player.h"
 #include "baddie.h"
 #include "bullet.h"
+#include "coin.h"
 
 #define WIDTH 480
 #define HEIGHT 270
 #define SCALE 2
 
 #define SHOOT_DELAY 0.1
-#define COIN_MIN_DIST 100
-#define COIN_EDGE_GAP 50
 #define TOUCHING_DIST 20
 
 #define DEBUG_TEXT_N 1000
 
 void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle);
-
-void move_coin(Vector2 *coin_pos, Vector2 player_pos);
 
 bool is_touching(Vector2 a, Vector2 b);
 
@@ -37,7 +33,6 @@ int main(void) {
 
     Rectangle screen_rect = {0, 0, WIDTH * SCALE, HEIGHT * SCALE};
     Rectangle grid_rect = {0, 0, 32, 32};
-    Rectangle coin_rect = {0, 0, 24, 24};
 
     World world = {.width=WIDTH, .height=HEIGHT};
 
@@ -55,8 +50,10 @@ int main(void) {
 
     add_baddie(baddies, player.pos);
 
-    Vector2 coin_pos;
-    move_coin(&coin_pos, player.pos);
+    Coin coin = {0};
+    coin.world = &world;
+    coin.texture = &coin_texture;
+    move_coin(&coin, player.pos);
 
     Bullet bullets[BULLET_N];
     for (int i = 0; i < BULLET_N; i++) {
@@ -73,13 +70,15 @@ int main(void) {
         update_player(&player, dt);
         update_baddies(baddies, dt);
         update_bullets(bullets, dt);
+        update_coin(&coin, dt);
 
         if (player.is_shooting && GetTime() > player.shoot_timer) {
             player.shoot_timer = GetTime() + SHOOT_DELAY;
             add_bullet(bullets, player.pos, player.angle);
         }
 
-        if (is_touching(player.pos, coin_pos)) move_coin(&coin_pos, player.pos);
+        if (is_touching(player.pos, coin.pos))
+            move_coin(&coin, player.pos);
 
         for (int i = 0; i < BULLET_N; i++) {
             Bullet *bullet = &bullets[i];
@@ -103,8 +102,8 @@ int main(void) {
             ClearBackground(BLACK);
 
             DrawTextureTiled(bg_texture, grid_rect, screen_rect, (Vector2) {0, 0}, 0, SCALE, WHITE);
-            scaled_draw(coin_texture, coin_rect, coin_pos, 0);
 
+            draw_coin(&coin, scaled_draw);
             draw_baddies(baddies, scaled_draw);
             draw_bullets(bullets, scaled_draw);
             draw_player(&player, scaled_draw);
@@ -137,14 +136,6 @@ void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle
     dest_rect.height *= SCALE;
 
     DrawTexturePro(texture, src_rect, dest_rect, middle, angle * RAD2DEG, WHITE);
-}
-
-void move_coin(Vector2 *coin_pos, Vector2 player_pos) {
-    *coin_pos = player_pos;
-    while (Vector2Distance(*coin_pos, player_pos) < COIN_MIN_DIST) {
-        coin_pos->x = COIN_EDGE_GAP + rand() % (WIDTH - COIN_EDGE_GAP * 2);
-        coin_pos->y = COIN_EDGE_GAP + rand() % (HEIGHT - COIN_EDGE_GAP * 2);
-    }
 }
 
 bool is_touching(Vector2 a, Vector2 b) {
