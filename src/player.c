@@ -35,9 +35,7 @@ void update_player(Player *player, float dt) {
     player->frame = player->is_shooting ? 1 : 0;
 }
 
-void draw_player(Player *player, Texture2D texture) {
+void draw_player(Player *player, void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
     Rectangle src_rect = {player->frame * 32, 0, 32, 32};
-    Rectangle dest_rect = {player->pos.x, player->pos.y, 32, 32};
-    Vector2 middle = {src_rect.width / 2, src_rect.height / 2};
-    DrawTexturePro(texture, src_rect, dest_rect, middle, player->angle * RAD2DEG, WHITE);
+    draw_func(*player->texture, src_rect, player->pos, player->angle);
 }

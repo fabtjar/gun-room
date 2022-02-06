@@ -11,6 +11,7 @@
 
 typedef struct Baddie {
     World *world;
+    Texture2D *texture;
     Vector2 pos;
     Vector2 vel;
     bool active;
@@ -21,6 +22,6 @@ Baddie *add_baddie(Baddie baddie[], Vector2 player_pos);
 
 void update_baddies(Baddie baddies[], float dt);
 
-void draw_baddies(Baddie baddies[], Texture2D texture);
+void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
 
 #endif //GUN_ROOM_BADDIE_H

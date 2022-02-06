@@ -6,6 +6,7 @@
 
 typedef struct Player {
     World *world;
+    Texture2D *texture;
     Vector2 pos;
     Vector2 vel;
     float angle;
@@ -16,6 +17,6 @@ typedef struct Player {
 
 void update_player(Player *player, float dt);
 
-void draw_player(Player *player, Texture2D texture);
+void draw_player(Player *player, void(*draw_func)(Texture2D, Rectangle, Vector2, float));
 
 #endif //GUN_ROOM_PLAYER_H

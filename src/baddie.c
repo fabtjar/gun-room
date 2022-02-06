@@ -68,17 +68,14 @@ void update_baddies(Baddie baddies[], float dt) {
     }
 }
 
-void draw_baddies(Baddie baddies[], Texture2D texture) {
+void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
     Rectangle src_rect = {0, 0, 32, 32};
-    Rectangle dest_rect = {0, 0, 32, 32};
-    Vector2 middle = {src_rect.width / 2, src_rect.height / 2};
 
     for (int i = 0; i < BADDIE_N; i++) {
         Baddie b = baddies[i];
-        if (!b.active) continue;
-        dest_rect.x = b.pos.x;
-        dest_rect.y = b.pos.y;
+        if (!b.active)
+            continue;
         float angle = Vector2Angle(Vector2Zero(), b.vel);
-        DrawTexturePro(texture, src_rect, dest_rect, middle, angle * RAD2DEG, WHITE);
+        draw_func(*b.texture, src_rect, b.pos, angle);
     }
 }

@@ -18,6 +18,8 @@
 
 #define DEBUG_TEXT_N 1000
 
+void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle);
+
 void move_coin(Vector2 *coin_pos, Vector2 player_pos);
 
 bool is_touching(Vector2 a, Vector2 b);
@@ -27,28 +29,27 @@ int main(void) {
     InitWindow(WIDTH * SCALE, HEIGHT * SCALE, "Gun Room");
     SetWindowMinSize(WIDTH, HEIGHT);
 
-    RenderTexture2D renderTexture = LoadRenderTexture(WIDTH, HEIGHT);
-
     Texture2D player_texture = LoadTexture("content/gunner.png");
     Texture2D baddie_texture = LoadTexture("content/baddie.png");
     Texture2D bullet_texture = LoadTexture("content/bullet.png");
     Texture2D coin_texture = LoadTexture("content/coin.png");
     Texture2D bg_texture = LoadTexture("content/grid.png");
 
-    Rectangle game_rect = {0, 0, WIDTH, HEIGHT};
-    Rectangle render_rect = {0, HEIGHT, WIDTH, -HEIGHT};
     Rectangle screen_rect = {0, 0, WIDTH * SCALE, HEIGHT * SCALE};
     Rectangle grid_rect = {0, 0, 32, 32};
+    Rectangle coin_rect = {0, 0, 24, 24};
 
     World world = {.width=WIDTH, .height=HEIGHT};
 
     Player player = {0};
     player.world = &world;
+    player.texture = &player_texture;
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
 
     Baddie baddies[BADDIE_N];
     for (int i = 0; i < BADDIE_N; i++) {
         baddies[i].world = &world;
+        baddies[i].texture = &baddie_texture;
         baddies[i].active = false;
     }
 
@@ -60,6 +61,7 @@ int main(void) {
     Bullet bullets[BULLET_N];
     for (int i = 0; i < BULLET_N; i++) {
         bullets[i].world = &world;
+        bullets[i].texture = &bullet_texture;
         bullets[i].active = false;
     }
 
@@ -96,24 +98,18 @@ int main(void) {
 
         if (IsKeyPressed(KEY_SPACE)) add_baddie(baddies, player.pos);
 
-        BeginTextureMode(renderTexture);
-        {
-            ClearBackground(WHITE);
-            DrawTextureTiled(bg_texture, grid_rect, game_rect, (Vector2) {0, 0}, 0, 1, WHITE);
-            DrawTexture(coin_texture, coin_pos.x - 12, coin_pos.y - 12, WHITE);
-
-            draw_baddies(baddies, baddie_texture);
-            draw_bullets(bullets, bullet_texture);
-            draw_player(&player, player_texture);
-
-            DrawText(debug_text, 4, 4, 20, BLACK);
-        }
-        EndTextureMode();
-
         BeginDrawing();
         {
             ClearBackground(BLACK);
-            DrawTexturePro(renderTexture.texture, render_rect, screen_rect, Vector2Zero(), 0, WHITE);
+
+            DrawTextureTiled(bg_texture, grid_rect, screen_rect, (Vector2) {0, 0}, 0, SCALE, WHITE);
+            scaled_draw(coin_texture, coin_rect, coin_pos, 0);
+
+            draw_baddies(baddies, scaled_draw);
+            draw_bullets(bullets, scaled_draw);
+            draw_player(&player, scaled_draw);
+
+            DrawText(debug_text, 8, 8, 40, BLACK);
         }
         EndDrawing();
     }
@@ -123,11 +119,24 @@ int main(void) {
     UnloadTexture(bullet_texture);
     UnloadTexture(coin_texture);
     UnloadTexture(bg_texture);
-    UnloadRenderTexture(renderTexture);
 
     CloseWindow();
 
     return 0;
+}
+
+void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle) {
+    Rectangle dest_rect = {pos.x, pos.y, src_rect.width, src_rect.height};
+    Vector2 middle = {src_rect.width / 2, src_rect.height / 2};
+
+    middle.x *= SCALE;
+    middle.y *= SCALE;
+    dest_rect.x *= SCALE;
+    dest_rect.y *= SCALE;
+    dest_rect.width *= SCALE;
+    dest_rect.height *= SCALE;
+
+    DrawTexturePro(texture, src_rect, dest_rect, middle, angle * RAD2DEG, WHITE);
 }
 
 void move_coin(Vector2 *coin_pos, Vector2 player_pos) {

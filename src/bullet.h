@@ -10,6 +10,7 @@
 
 typedef struct Bullet {
     World *world;
+    Texture2D *texture;
     Vector2 pos;
     Vector2 vel;
     bool active;
@@ -19,6 +20,6 @@ Bullet *add_bullet(Bullet bullets[], Vector2 pos, float angle);
 
 void update_bullets(Bullet bullets[], float dt);
 
-void draw_bullets(Bullet bullets[], Texture2D texture);
+void draw_bullets(Bullet bullets[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
 
 #endif //GUN_ROOM_BULLET_H

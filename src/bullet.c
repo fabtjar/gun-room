@@ -24,9 +24,12 @@ void update_bullets(Bullet bullets[], float dt) {
     }
 }
 
-void draw_bullets(Bullet bullets[], Texture2D texture) {
+void draw_bullets(Bullet bullets[], void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+    Rectangle src_rect = {0, 0, 20, 20};
+
     for (int i = 0; i < BULLET_N; i++) {
         Bullet b = bullets[i];
-        if (b.active) DrawTexture(texture, b.pos.x - 10, b.pos.y - 10, WHITE);
+        if (b.active)
+            draw_func(*b.texture, src_rect, b.pos, 0);
     }
 }
