@@ -6,6 +6,7 @@
 #include "baddie.h"
 #include "bullet.h"
 #include "coin.h"
+#include "boom.h"
 
 #define WIDTH 480
 #define HEIGHT 270
@@ -29,6 +30,7 @@ int main(void) {
     Texture2D baddie_texture = LoadTexture("content/baddie.png");
     Texture2D bullet_texture = LoadTexture("content/bullet.png");
     Texture2D coin_texture = LoadTexture("content/coin.png");
+    Texture2D boom_texture = LoadTexture("content/boom.png");
     Texture2D bg_texture = LoadTexture("content/grid.png");
 
     Rectangle screen_rect = {0, 0, WIDTH * SCALE, HEIGHT * SCALE};
@@ -50,17 +52,24 @@ int main(void) {
 
     add_baddie(baddies, player.pos);
 
-    Coin coin = {0};
-    coin.world = &world;
-    coin.texture = &coin_texture;
-    move_coin(&coin, player.pos);
-
     Bullet bullets[BULLET_N];
     for (int i = 0; i < BULLET_N; i++) {
         bullets[i].world = &world;
         bullets[i].texture = &bullet_texture;
         bullets[i].active = false;
     }
+
+    Boom booms[BOOM_N];
+    for (int i = 0; i < BOOM_N; i++) {
+        booms[i].texture = &boom_texture;
+        booms[i].active = false;
+    }
+
+    Coin coin = {0};
+    coin.world = &world;
+    coin.texture = &coin_texture;
+    move_coin(&coin, player.pos);
+    add_boom(booms, coin.pos);
 
     char debug_text[DEBUG_TEXT_N];
 
@@ -71,14 +80,17 @@ int main(void) {
         update_baddies(baddies, dt);
         update_bullets(bullets, dt);
         update_coin(&coin, dt);
+        update_booms(booms, dt);
 
         if (player.is_shooting && GetTime() > player.shoot_timer) {
             player.shoot_timer = GetTime() + SHOOT_DELAY;
             add_bullet(bullets, player.pos, player.angle);
         }
 
-        if (is_touching(player.pos, coin.pos))
+        if (is_touching(player.pos, coin.pos)) {
             move_coin(&coin, player.pos);
+            add_boom(booms, coin.pos);
+        }
 
         for (int i = 0; i < BULLET_N; i++) {
             Bullet *bullet = &bullets[i];
@@ -89,6 +101,7 @@ int main(void) {
                 if (is_touching(bullet->pos, baddie->pos)) {
                     bullet->active = false;
                     baddie->active = false;
+                    add_boom(booms, baddie->pos);
                 }
             }
         }
@@ -107,6 +120,7 @@ int main(void) {
             draw_baddies(baddies, scaled_draw);
             draw_bullets(bullets, scaled_draw);
             draw_player(&player, scaled_draw);
+            draw_booms(booms, scaled_draw);
 
             DrawText(debug_text, 8, 8, 40, BLACK);
         }
@@ -117,6 +131,7 @@ int main(void) {
     UnloadTexture(baddie_texture);
     UnloadTexture(bullet_texture);
     UnloadTexture(coin_texture);
+    UnloadTexture(boom_texture);
     UnloadTexture(bg_texture);
 
     CloseWindow();
