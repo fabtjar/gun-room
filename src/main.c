@@ -52,7 +52,7 @@ int main(void) {
         baddies[i].active = false;
     }
 
-    add_baddie(baddies);
+    add_baddie(baddies, player.pos);
 
     Vector2 coin_pos;
     move_coin(&coin_pos, player.pos);
@@ -94,7 +94,7 @@ int main(void) {
 
         sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
 
-        if (IsKeyPressed(KEY_SPACE)) add_baddie(baddies);
+        if (IsKeyPressed(KEY_SPACE)) add_baddie(baddies, player.pos);
 
         BeginTextureMode(renderTexture);
         {
