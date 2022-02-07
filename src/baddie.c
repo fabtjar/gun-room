@@ -1,6 +1,7 @@
 #include "baddie.h"
 #include "raymath.h"
 #include <stdlib.h>
+#include "math_utils.h"
 
 Baddie *add_baddie(Baddie baddie[], Vector2 player_pos) {
     for (int i = 0; i < BADDIE_N; i++) {
@@ -28,6 +29,7 @@ Baddie *add_baddie(Baddie baddie[], Vector2 player_pos) {
         Vector2 dist = Vector2Subtract(player_pos, b->pos);
         Vector2 normal = Vector2Normalize(dist);
         b->vel = Vector2Scale(normal, BADDIE_SPEED);
+        b->angle = Vector2Angle(Vector2Zero(), b->vel);
         return b;
     }
     return NULL;
@@ -65,6 +67,9 @@ void update_baddies(Baddie baddies[], float dt) {
             b->pos.y = game_height;
             b->vel.y *= -1;
         }
+
+        b->target_angle = Vector2Angle(Vector2Zero(), b->vel);
+        b->angle = approach_angle(b->angle, b->target_angle, BADDIE_ANGLE_VEL * DEG2RAD * dt);
     }
 }
 
@@ -75,7 +80,6 @@ void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vecto
         Baddie b = baddies[i];
         if (!b.active)
             continue;
-        float angle = Vector2Angle(Vector2Zero(), b.vel);
-        draw_func(*b.texture, src_rect, b.pos, angle);
+        draw_func(*b.texture, src_rect, b.pos, b.angle);
     }
 }

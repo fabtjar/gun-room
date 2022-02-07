@@ -2,10 +2,6 @@
 #include "raymath.h"
 #include "math_utils.h"
 
-#define PLAYER_SPEED 150
-#define PLAYER_DECEL 100
-#define PLAYER_DECEL 100
-
 void update_player(Player *player, float dt) {
     player->vel.x = approach(player->vel.x, 0, PLAYER_DECEL * dt);
     player->vel.y = approach(player->vel.y, 0, PLAYER_DECEL * dt);
@@ -21,8 +17,10 @@ void update_player(Player *player, float dt) {
     if (dir.x != 0 || dir.y != 0) {
         if (!player->is_shooting)
             player->vel = Vector2Scale(Vector2Normalize(dir), PLAYER_SPEED);
-        player->angle = Vector2Angle(Vector2Zero(), dir);
+        player->target_angle = Vector2Angle(Vector2Zero(), dir);
     }
+
+    player->angle = approach_angle(player->angle, player->target_angle, PLAYER_ANGLE_VEL * DEG2RAD * dt);
 
     player->pos.x += player->vel.x * dt;
     player->pos.y += player->vel.y * dt;

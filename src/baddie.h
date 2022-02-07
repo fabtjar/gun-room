@@ -8,12 +8,15 @@
 #define BADDIE_SPEED 80
 #define BADDIE_MIN_DIST 200
 #define BADDIE_OUTSIDE_DIST 20
+#define BADDIE_ANGLE_VEL 1000
 
 typedef struct Baddie {
     World *world;
     Texture2D *texture;
     Vector2 pos;
     Vector2 vel;
+    float angle;
+    float target_angle;
     bool active;
     bool checkBoundary;
 } Baddie;

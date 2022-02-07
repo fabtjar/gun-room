@@ -1,6 +1,10 @@
 #ifndef GUN_ROOM_PLAYER_H
 #define GUN_ROOM_PLAYER_H
 
+#define PLAYER_SPEED 150
+#define PLAYER_DECEL 100
+#define PLAYER_ANGLE_VEL 1000
+
 #include "raylib.h"
 #include "world.h"
 
@@ -10,6 +14,7 @@ typedef struct Player {
     Vector2 pos;
     Vector2 vel;
     float angle;
+    float target_angle;
     bool is_shooting;
     double shoot_timer;
     int frame;
