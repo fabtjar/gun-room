@@ -116,6 +116,8 @@ void update() {
         add_boom(booms, coin.pos);
     }
 
+    coin_follow(&coin, player.pos);
+
     for (int i = 0; i < BULLET_N; i++) {
         Bullet *bullet = &bullets[i];
         if (!bullet->active) continue;
