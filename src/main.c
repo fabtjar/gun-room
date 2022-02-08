@@ -47,12 +47,12 @@ int main(void) {
     InitWindow(WIDTH * SCALE, HEIGHT * SCALE, "Gun Room");
     SetWindowMinSize(WIDTH, HEIGHT);
 
-    player_texture = LoadTexture("content/gunner.png");
-    baddie_texture = LoadTexture("content/baddie.png");
-    bullet_texture = LoadTexture("content/bullet.png");
-    coin_texture = LoadTexture("content/coin.png");
-    boom_texture = LoadTexture("content/boom.png");
-    bg_texture = LoadTexture("content/grid.png");
+    player_texture = LoadTexture("content/sprites/gunner.png");
+    baddie_texture = LoadTexture("content/sprites/baddie.png");
+    bullet_texture = LoadTexture("content/sprites/bullet.png");
+    coin_texture = LoadTexture("content/sprites/coin.png");
+    boom_texture = LoadTexture("content/sprites/boom.png");
+    bg_texture = LoadTexture("content/sprites/grid.png");
 
     init();
     while (!WindowShouldClose()) {
