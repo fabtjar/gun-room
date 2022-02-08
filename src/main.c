@@ -7,6 +7,7 @@
 #include "bullet.h"
 #include "coin.h"
 #include "boom.h"
+#include "dead_baddie.h"
 
 #define WIDTH 480
 #define HEIGHT 270
@@ -25,6 +26,7 @@ static Texture2D bg_texture;
 static World world = {.width=WIDTH, .height=HEIGHT};
 static Player player = {0};
 static Baddie baddies[BADDIE_N] = {0};
+static DeadBaddie dead_baddies[BADDIE_N] = {0};
 static Bullet bullets[BULLET_N] = {0};
 static Boom booms[BOOM_N] = {0};
 static Coin coin = {0};
@@ -79,7 +81,11 @@ void init() {
         baddies[i].active = false;
     }
 
-    add_baddie(baddies, player.pos);
+    for (int i = 0; i < BADDIE_N; i++) {
+        dead_baddies[i].world = &world;
+        dead_baddies[i].texture = &baddie_texture;
+        dead_baddies[i].active = false;
+    }
 
     for (int i = 0; i < BULLET_N; i++) {
         bullets[i].world = &world;
@@ -106,6 +112,7 @@ void update() {
     update_bullets(bullets, dt);
     update_coin(&coin, dt);
     update_booms(booms, dt);
+    update_dead_baddies(dead_baddies, dt);
 
     if (player.is_shooting)
         add_bullet(bullets, player.pos, player.angle);
@@ -127,6 +134,7 @@ void update() {
                 bullet->active = false;
                 baddie->active = false;
                 add_boom(booms, baddie->pos);
+                add_dead_baddie(dead_baddies, baddie->pos, player.pos);
             }
         }
     }
@@ -150,6 +158,7 @@ void draw() {
         Rectangle grid_rect = {0, 0, 32, 32};
         DrawTextureTiled(bg_texture, grid_rect, screen_rect, (Vector2) {0, 0}, 0, SCALE, WHITE);
 
+        draw_dead_baddies(dead_baddies, scaled_draw);
         draw_coin(&coin, scaled_draw);
         draw_baddies(baddies, scaled_draw);
         draw_bullets(bullets, scaled_draw);
