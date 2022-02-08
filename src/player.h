@@ -4,6 +4,7 @@
 #define PLAYER_SPEED 150
 #define PLAYER_DECEL 100
 #define PLAYER_ANGLE_VEL 1000
+#define PLAYER_SHOOT_DELAY 0.1
 
 #include "raylib.h"
 #include "world.h"
@@ -16,7 +17,7 @@ typedef struct Player {
     float angle;
     float target_angle;
     bool is_shooting;
-    double shoot_timer;
+    float shoot_timer;
     int frame;
 } Player;
 

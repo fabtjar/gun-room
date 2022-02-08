@@ -12,7 +12,6 @@
 #define HEIGHT 270
 #define SCALE 2
 
-#define SHOOT_DELAY 0.1
 #define TOUCHING_DIST 20
 
 #define DEBUG_TEXT_N 1000
@@ -71,6 +70,8 @@ void init() {
     player.texture = &player_texture;
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
     player.vel = Vector2Zero();
+    player.is_shooting = false;
+    player.shoot_timer = 0;
 
     for (int i = 0; i < BADDIE_N; i++) {
         baddies[i].world = &world;
@@ -106,10 +107,8 @@ void update() {
     update_coin(&coin, dt);
     update_booms(booms, dt);
 
-    if (player.is_shooting && GetTime() > player.shoot_timer) {
-        player.shoot_timer = GetTime() + SHOOT_DELAY;
+    if (player.is_shooting)
         add_bullet(bullets, player.pos, player.angle);
-    }
 
     if (is_touching(player.pos, coin.pos)) {
         move_coin(&coin, player.pos);
