@@ -14,6 +14,7 @@
 #define SCALE 2
 
 #define TOUCHING_DIST 20
+#define RED_ALPHA_SPEED 3
 
 #define DEBUG_TEXT_N 1000
 
@@ -31,6 +32,7 @@ static Bullet bullets[BULLET_N] = {0};
 static Boom booms[BOOM_N] = {0};
 static Coin coin = {0};
 static bool game_over;
+static float red_alpha;
 static char debug_text[DEBUG_TEXT_N] = "";
 
 static void init();
@@ -61,8 +63,10 @@ int main(void) {
     while (!WindowShouldClose()) {
         if (!game_over)
             update();
+        else if (red_alpha > 0)
+            red_alpha -= RED_ALPHA_SPEED * GetFrameTime();
 
-        sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
+        sprintf(debug_text, "%f\n", red_alpha);
 
         if (IsKeyPressed(KEY_SPACE))
             add_baddie(baddies, player.pos);
@@ -80,6 +84,7 @@ int main(void) {
 
 void init() {
     game_over = false;
+    red_alpha = 1;
 
     player.world = &world;
     player.texture = &player_texture;
@@ -178,6 +183,12 @@ void draw() {
         draw_bullets(bullets, scaled_draw);
         draw_player(&player, scaled_draw);
         draw_booms(booms, scaled_draw);
+
+        if (game_over && red_alpha > 0) {
+            Color red = RED;
+            red.a = (int) (red_alpha * 255);
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), red);
+        }
 
         DrawText(debug_text, 8, 8, 40, BLACK);
     }
