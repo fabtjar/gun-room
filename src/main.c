@@ -108,7 +108,7 @@ void update() {
     float dt = GetFrameTime();
 
     update_player(&player, dt);
-    update_baddies(baddies, dt);
+    update_baddies(baddies, player.pos, dt);
     update_bullets(bullets, dt);
     update_coin(&coin, dt);
     update_booms(booms, dt);
