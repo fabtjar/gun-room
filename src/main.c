@@ -30,6 +30,7 @@ static DeadBaddie dead_baddies[BADDIE_N] = {0};
 static Bullet bullets[BULLET_N] = {0};
 static Boom booms[BOOM_N] = {0};
 static Coin coin = {0};
+static bool game_over;
 static char debug_text[DEBUG_TEXT_N] = "";
 
 static void init();
@@ -58,7 +59,17 @@ int main(void) {
 
     init();
     while (!WindowShouldClose()) {
-        update();
+        if (!game_over)
+            update();
+
+        sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
+
+        if (IsKeyPressed(KEY_SPACE))
+            add_baddie(baddies, player.pos);
+
+        if (IsKeyPressed(KEY_R))
+            init();
+
         draw();
     }
     unload();
@@ -68,6 +79,8 @@ int main(void) {
 }
 
 void init() {
+    game_over = false;
+
     player.world = &world;
     player.texture = &player_texture;
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
@@ -139,13 +152,14 @@ void update() {
         }
     }
 
-    sprintf(debug_text, "%d\n%d", (int) player.pos.x, (int) player.pos.y);
-
-    if (IsKeyPressed(KEY_SPACE))
-        add_baddie(baddies, player.pos);
-
-    if (IsKeyPressed(KEY_R))
-        init();
+    for (int i = 0; i < BADDIE_N; i++) {
+        Baddie *b = &baddies[i];
+        if (b->active && is_touching(b->pos, player.pos)) {
+            game_over = true;
+            player.frame = 2;
+            return;
+        }
+    }
 }
 
 
