@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "raylib.h"
 #include "raymath.h"
 #include "world.h"
@@ -16,6 +17,11 @@
 #define TOUCHING_DIST 20
 #define RED_ALPHA_SPEED 3
 
+#define BADDIE_SPAWN_INIT_DELAY 1
+#define BADDIE_SPAWN_DELAY_REDUCE 0.005
+#define BADDIE_SPAWN_MIN_DELAY 0.25
+#define BADDIE_SPAWN_INCREASE 0.3
+
 #define DEBUG_TEXT_N 1000
 
 static Texture2D player_texture;
@@ -31,8 +37,12 @@ static DeadBaddie dead_baddies[BADDIE_N] = {0};
 static Bullet bullets[BULLET_N] = {0};
 static Boom booms[BOOM_N] = {0};
 static Coin coin = {0};
+static bool game_start;
 static bool game_over;
 static float red_alpha;
+static float baddie_spawn_timer;
+static float baddie_spawn_delay;
+static float baddies_to_spawn;
 static char debug_text[DEBUG_TEXT_N] = "";
 
 static void init();
@@ -66,10 +76,7 @@ int main(void) {
         else if (red_alpha > 0)
             red_alpha -= RED_ALPHA_SPEED * GetFrameTime();
 
-        sprintf(debug_text, "%f\n", red_alpha);
-
-        if (IsKeyPressed(KEY_SPACE))
-            add_baddie(baddies, player.pos);
+        sprintf(debug_text, "%f\n%f", baddie_spawn_delay, baddies_to_spawn);
 
         if (IsKeyPressed(KEY_R))
             init();
@@ -83,8 +90,13 @@ int main(void) {
 }
 
 void init() {
+    game_start = false;
     game_over = false;
     red_alpha = 1;
+
+    baddie_spawn_timer = 0;
+    baddie_spawn_delay = BADDIE_SPAWN_INIT_DELAY;
+    baddies_to_spawn = 1;
 
     player.world = &world;
     player.texture = &player_texture;
@@ -138,6 +150,11 @@ void update() {
     if (is_touching(player.pos, coin.pos)) {
         move_coin(&coin, player.pos);
         add_boom(booms, coin.pos);
+        game_start = true;
+
+        for (int i = 0; i < (int) baddies_to_spawn; i++)
+            add_baddie(baddies, player.pos);
+        baddies_to_spawn += BADDIE_SPAWN_INCREASE;
     }
 
     coin_follow(&coin, player.pos);
@@ -164,6 +181,13 @@ void update() {
             player.frame = 2;
             return;
         }
+    }
+
+    baddie_spawn_timer -= dt;
+    if (game_start && baddie_spawn_timer < 0) {
+        baddie_spawn_delay = fmaxf(BADDIE_SPAWN_MIN_DELAY, baddie_spawn_delay - BADDIE_SPAWN_DELAY_REDUCE);
+        baddie_spawn_timer = baddie_spawn_delay;
+        add_baddie(baddies, player.pos);
     }
 }
 
