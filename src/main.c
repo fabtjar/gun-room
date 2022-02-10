@@ -173,6 +173,7 @@ void update() {
                 baddie->active = false;
                 add_boom(booms, baddie->pos);
                 add_dead_baddie(dead_baddies, baddie->pos, player.pos);
+                player.scale = 1;
             }
         }
     }
