@@ -82,13 +82,13 @@ void update_baddies(Baddie baddies[], Vector2 player_pos, float dt) {
     }
 }
 
-void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float)) {
     Rectangle src_rect = {0, 0, 32, 32};
 
     for (int i = 0; i < BADDIE_N; i++) {
         Baddie b = baddies[i];
         if (!b.active)
             continue;
-        draw_func(*b.texture, src_rect, b.pos, b.angle);
+        draw_func(*b.texture, src_rect, b.pos, b.angle, 1);
     }
 }

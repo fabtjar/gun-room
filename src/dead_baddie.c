@@ -63,13 +63,13 @@ void update_dead_baddies(DeadBaddie dead_baddie[], float dt) {
     }
 }
 
-void draw_dead_baddies(DeadBaddie dead_baddie[], void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+void draw_dead_baddies(DeadBaddie dead_baddie[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float)) {
     Rectangle src_rect = {32, 0, 32, 32};
 
     for (int i = 0; i < BADDIE_N; i++) {
         DeadBaddie b = dead_baddie[i];
         if (!b.active || !b.visible)
             continue;
-        draw_func(*b.texture, src_rect, b.pos, b.angle);
+        draw_func(*b.texture, src_rect, b.pos, b.angle, 1);
     }
 }

@@ -53,7 +53,7 @@ static void draw();
 
 static void unload();
 
-static void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle);
+static void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle, float scale);
 
 static bool is_touching(Vector2 a, Vector2 b);
 
@@ -102,6 +102,7 @@ void init() {
     player.texture = &player_texture;
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
     player.vel = Vector2Zero();
+    player.scale = 1;
     player.is_shooting = false;
     player.shoot_timer = 0;
 
@@ -151,6 +152,8 @@ void update() {
         move_coin(&coin, player.pos);
         add_boom(booms, coin.pos);
         game_start = true;
+
+        player_get_coin(&player);
 
         for (int i = 0; i < (int) baddies_to_spawn; i++)
             add_baddie(baddies, player.pos);
@@ -228,9 +231,9 @@ void unload() {
     UnloadTexture(bg_texture);
 }
 
-void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle) {
-    Rectangle dest_rect = {pos.x, pos.y, src_rect.width, src_rect.height};
-    Vector2 middle = {src_rect.width / 2, src_rect.height / 2};
+void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle, float scale) {
+    Rectangle dest_rect = {pos.x, pos.y, src_rect.width * scale, src_rect.height * scale};
+    Vector2 middle = {dest_rect.width / 2, dest_rect.height / 2};
 
     middle.x *= SCALE;
     middle.y *= SCALE;

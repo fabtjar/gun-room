@@ -29,7 +29,7 @@ void update_booms(Boom booms[], float dt) {
     }
 }
 
-void draw_booms(Boom booms[], void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+void draw_booms(Boom booms[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float)) {
     for (int i = 0; i < BOOM_N; i++) {
         Boom b = booms[i];
         if (!b.active)
@@ -37,6 +37,6 @@ void draw_booms(Boom booms[], void(*draw_func)(Texture2D, Rectangle, Vector2, fl
 
         int frame = (int) (b.time / (1.0 / BOOM_FPS));
         Rectangle src_rect = {32 * frame, 0, 32, 32};
-        draw_func(*b.texture, src_rect, b.pos, b.angle);
+        draw_func(*b.texture, src_rect, b.pos, b.angle, 1);
     }
 }

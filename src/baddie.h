@@ -29,6 +29,6 @@ Baddie *add_baddie(Baddie baddie[], Vector2 player_pos);
 
 void update_baddies(Baddie baddies[], Vector2 player_pos, float dt);
 
-void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
+void draw_baddies(Baddie baddies[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float));
 
 #endif //GUN_ROOM_BADDIE_H

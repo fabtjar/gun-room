@@ -43,9 +43,9 @@ void update_coin(Coin *coin, float dt) {
     }
 }
 
-void draw_coin(Coin *coin, void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+void draw_coin(Coin *coin, void(*draw_func)(Texture2D, Rectangle, Vector2, float, float)) {
     Rectangle src_rect = {0, 0, 24, 24};
-    draw_func(*coin->texture, src_rect, coin->pos, coin->angle);
+    draw_func(*coin->texture, src_rect, coin->pos, coin->angle, 1);
 }
 
 void coin_follow(Coin *coin, Vector2 pos) {

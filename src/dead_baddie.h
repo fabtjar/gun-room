@@ -25,6 +25,6 @@ DeadBaddie *add_dead_baddie(DeadBaddie dead_baddie[], Vector2 baddie_pos, Vector
 
 void update_dead_baddies(DeadBaddie dead_baddie[], float dt);
 
-void draw_dead_baddies(DeadBaddie dead_baddie[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
+void draw_dead_baddies(DeadBaddie dead_baddie[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float));
 
 #endif //GUN_ROOM_DEAD_BADDIE_H

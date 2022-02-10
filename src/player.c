@@ -37,10 +37,17 @@ void update_player(Player *player, float dt) {
     if (player->pos.y < 0) player->pos.y = 0;
     else if (player->pos.y > player->world->height) player->pos.y = player->world->height;
 
+    if (player->scale > 1)
+        player->scale = approach(player->scale, 1, PLAYER_SCALE_SPEED * dt);
+
     player->frame = shoot_pressed ? 1 : 0;
 }
 
-void draw_player(Player *player, void(*draw_func)(Texture2D, Rectangle, Vector2, float)) {
+void player_get_coin(Player *player) {
+    player->scale = PLAYER_SCALE_BIG;
+}
+
+void draw_player(Player *player, void(*draw_func)(Texture2D, Rectangle, Vector2, float, float)) {
     Rectangle src_rect = {player->frame * 32, 0, 32, 32};
-    draw_func(*player->texture, src_rect, player->pos, player->angle);
+    draw_func(*player->texture, src_rect, player->pos, player->angle, player->scale);
 }

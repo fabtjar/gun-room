@@ -18,6 +18,6 @@ Boom *add_boom(Boom booms[], Vector2 pos);
 
 void update_booms(Boom booms[], float dt);
 
-void draw_booms(Boom booms[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
+void draw_booms(Boom booms[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float));
 
 #endif //GUN_ROOM_BOOM_H

@@ -20,6 +20,6 @@ Bullet *add_bullet(Bullet bullets[], Vector2 pos, float angle);
 
 void update_bullets(Bullet bullets[], float dt);
 
-void draw_bullets(Bullet bullets[], void(*draw_func)(Texture2D, Rectangle, Vector2, float));
+void draw_bullets(Bullet bullets[], void(*draw_func)(Texture2D, Rectangle, Vector2, float, float));
 
 #endif //GUN_ROOM_BULLET_H

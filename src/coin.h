@@ -27,7 +27,7 @@ void move_coin(Coin *coin, Vector2 player_pos);
 
 void update_coin(Coin *coin, float dt);
 
-void draw_coin(Coin *coin, void(*draw_func)(Texture2D, Rectangle, Vector2, float));
+void draw_coin(Coin *coin, void(*draw_func)(Texture2D, Rectangle, Vector2, float, float));
 
 void coin_follow(Coin *coin, Vector2 pos);
 
