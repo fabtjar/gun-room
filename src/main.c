@@ -16,13 +16,12 @@
 
 #define TOUCHING_DIST 22
 #define RED_ALPHA_SPEED 3
+#define FONT_SIZE 64
 
 #define BADDIE_SPAWN_INIT_DELAY 1
 #define BADDIE_SPAWN_DELAY_REDUCE 0.005
 #define BADDIE_SPAWN_MIN_DELAY 0.25
 #define BADDIE_SPAWN_INCREASE 0.3
-
-#define DEBUG_TEXT_N 1000
 
 static Texture2D player_texture;
 static Texture2D baddie_texture;
@@ -43,7 +42,9 @@ static float red_alpha;
 static float baddie_spawn_timer;
 static float baddie_spawn_delay;
 static float baddies_to_spawn;
-static char debug_text[DEBUG_TEXT_N] = "";
+static int score;
+static char score_text[4];
+static char top_text[100];
 
 static void init();
 
@@ -56,6 +57,8 @@ static void unload();
 static void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle, float scale);
 
 static bool is_touching(Vector2 a, Vector2 b);
+
+void draw_text(const char *text, int x, int y);
 
 int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT);
@@ -76,10 +79,10 @@ int main(void) {
         else if (red_alpha > 0)
             red_alpha -= RED_ALPHA_SPEED * GetFrameTime();
 
-        sprintf(debug_text, "%f\n%f", baddie_spawn_delay, baddies_to_spawn);
-
         if (IsKeyPressed(KEY_R))
             init();
+
+        sprintf(score_text, "%d", score);
 
         draw();
     }
@@ -92,6 +95,7 @@ int main(void) {
 void init() {
     game_start = false;
     game_over = false;
+    score = 0;
     red_alpha = 1;
 
     baddie_spawn_timer = 0;
@@ -152,7 +156,7 @@ void update() {
         move_coin(&coin, player.pos);
         add_boom(booms, coin.pos);
         game_start = true;
-
+        score++;
         player_get_coin(&player);
 
         for (int i = 0; i < (int) baddies_to_spawn; i++)
@@ -218,9 +222,38 @@ void draw() {
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), red);
         }
 
-        DrawText(debug_text, 8, 8, 40, BLACK);
+        if (!game_start) {
+            char *top_text = "Gun Room";
+            draw_text(top_text, GetScreenWidth() / 2 - MeasureText(top_text, FONT_SIZE) / 2, 8);
+            char *bottom_text = "By Fabian Jarrett";
+            draw_text(
+                    bottom_text,
+                    GetScreenWidth() / 2 - MeasureText(bottom_text, FONT_SIZE) / 2,
+                    GetScreenHeight() - FONT_SIZE - 8
+            );
+        }
+
+        if (game_start && !game_over) {
+            draw_text(score_text, 8, 8);
+        }
+
+        if (game_over) {
+            sprintf(top_text, "you scored %d!", score);
+            draw_text(top_text, GetScreenWidth() / 2 - MeasureText(top_text, FONT_SIZE) / 2, 8);
+            char *bottom_text = "press R to restart";
+            draw_text(
+                    bottom_text,
+                    GetScreenWidth() / 2 - MeasureText(bottom_text, FONT_SIZE) / 2,
+                    GetScreenHeight() - FONT_SIZE - 8
+            );
+        }
     }
     EndDrawing();
+}
+
+void draw_text(const char *text, int x, int y) {
+    DrawText(text, x, y + SCALE * 2, FONT_SIZE, BLACK);
+    DrawText(text, x, y, FONT_SIZE, WHITE);
 }
 
 void unload() {
