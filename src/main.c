@@ -14,7 +14,7 @@
 #define HEIGHT 270
 #define SCALE 2
 
-#define TOUCHING_DIST 20
+#define TOUCHING_DIST 22
 #define RED_ALPHA_SPEED 3
 
 #define BADDIE_SPAWN_INIT_DELAY 1
