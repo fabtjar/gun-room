@@ -9,6 +9,8 @@
 #include "coin.h"
 #include "boom.h"
 #include "dead_baddie.h"
+#include "math_utils.h"
+#include <stdlib.h>
 
 #define WIDTH 480
 #define HEIGHT 270
@@ -17,6 +19,10 @@
 #define TOUCHING_DIST 22
 #define RED_ALPHA_SPEED 3
 #define FONT_SIZE 64
+
+#define SHAKE_SMALL 5
+#define SHAKE_BIG 15
+#define SHAKE_DECEL 10
 
 #define BADDIE_SPAWN_INIT_DELAY 1
 #define BADDIE_SPAWN_DELAY_REDUCE 0.005
@@ -45,6 +51,8 @@ static float baddies_to_spawn;
 static int score;
 static char score_text[4];
 static char top_text[100];
+static float shake_amount;
+static Vector2 cam_pos;
 
 static void init();
 
@@ -84,6 +92,10 @@ int main(void) {
 
         sprintf(score_text, "%d", score);
 
+        shake_amount = approach(shake_amount, 0, SHAKE_DECEL * GetFrameTime());
+        float angle = (rand() % 360) * DEG2RAD;
+        cam_pos = Vector2Rotate((Vector2) {shake_amount}, angle);
+
         draw();
     }
     unload();
@@ -97,6 +109,8 @@ void init() {
     game_over = false;
     score = 0;
     red_alpha = 1;
+    shake_amount = 0;
+    cam_pos = Vector2Zero();
 
     baddie_spawn_timer = 0;
     baddie_spawn_delay = BADDIE_SPAWN_INIT_DELAY;
@@ -158,6 +172,7 @@ void update() {
         game_start = true;
         score++;
         player_get_coin(&player);
+        shake_amount = SHAKE_SMALL;
 
         for (int i = 0; i < (int) baddies_to_spawn; i++)
             add_baddie(baddies, player.pos);
@@ -177,7 +192,7 @@ void update() {
                 baddie->active = false;
                 add_boom(booms, baddie->pos);
                 add_dead_baddie(dead_baddies, baddie->pos, player.pos);
-                player.scale = 1;
+                shake_amount = SHAKE_SMALL;
             }
         }
     }
@@ -187,6 +202,8 @@ void update() {
         if (b->active && is_touching(b->pos, player.pos)) {
             game_over = true;
             player.frame = 2;
+            player.scale = 1;
+            shake_amount = SHAKE_BIG;
             return;
         }
     }
@@ -205,7 +222,8 @@ void draw() {
     {
         ClearBackground(BLACK);
 
-        Rectangle screen_rect = {0, 0, WIDTH * SCALE, HEIGHT * SCALE};
+        float over = 32;
+        Rectangle screen_rect = {-over + cam_pos.x, -over + cam_pos.y, (WIDTH + over) * SCALE, (HEIGHT + over) * SCALE};
         Rectangle grid_rect = {0, 0, 32, 32};
         DrawTextureTiled(bg_texture, grid_rect, screen_rect, (Vector2) {0, 0}, 0, SCALE, WHITE);
 
@@ -285,6 +303,9 @@ void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle
     dest_rect.y *= SCALE;
     dest_rect.width *= SCALE;
     dest_rect.height *= SCALE;
+
+    dest_rect.x += cam_pos.x;
+    dest_rect.y += cam_pos.y;
 
     DrawTexturePro(texture, src_rect, dest_rect, middle, angle * RAD2DEG, WHITE);
 }
