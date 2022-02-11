@@ -222,6 +222,15 @@ void draw() {
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), red);
         }
 
+        // Dark bars.
+        if (!game_start || game_over) {
+            Color col = BLACK;
+            col.a = 150;
+            int bar_height = FONT_SIZE + 16;
+            DrawRectangle(0, 0, GetScreenWidth(), bar_height, col);
+            DrawRectangle(0, GetScreenHeight() - bar_height, GetScreenWidth(), bar_height, col);
+        }
+
         if (!game_start) {
             char *top_text = "Gun Room";
             draw_text(top_text, GetScreenWidth() / 2 - MeasureText(top_text, FONT_SIZE) / 2, 8);
