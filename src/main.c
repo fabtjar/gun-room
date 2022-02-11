@@ -225,7 +225,7 @@ void draw() {
         if (!game_start) {
             char *top_text = "Gun Room";
             draw_text(top_text, GetScreenWidth() / 2 - MeasureText(top_text, FONT_SIZE) / 2, 8);
-            char *bottom_text = "By Fabian Jarrett";
+            char *bottom_text = "Arrows to move, Z to shoot";
             draw_text(
                     bottom_text,
                     GetScreenWidth() / 2 - MeasureText(bottom_text, FONT_SIZE) / 2,
