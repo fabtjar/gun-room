@@ -216,12 +216,6 @@ void draw() {
         draw_player(&player, scaled_draw);
         draw_booms(booms, scaled_draw);
 
-        if (game_over && red_alpha > 0) {
-            Color red = RED;
-            red.a = (int) (red_alpha * 255);
-            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), red);
-        }
-
         // Dark bars.
         if (!game_start || game_over) {
             Color col = BLACK;
@@ -255,6 +249,13 @@ void draw() {
                     GetScreenWidth() / 2 - MeasureText(bottom_text, FONT_SIZE) / 2,
                     GetScreenHeight() - FONT_SIZE - 8
             );
+        }
+
+        // Red fade.
+        if (game_over && red_alpha > 0) {
+            Color red = RED;
+            red.a = (int) (red_alpha * 255);
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), red);
         }
     }
     EndDrawing();
