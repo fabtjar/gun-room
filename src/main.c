@@ -121,6 +121,8 @@ void init() {
     player.pos = (Vector2) {WIDTH / 2, HEIGHT / 2};
     player.vel = Vector2Zero();
     player.scale = 1;
+    player.angle = (rand() % 360) * DEG2RAD;
+    player.target_angle = player.angle;
     player.is_shooting = false;
     player.shoot_timer = 0;
 
