@@ -35,6 +35,12 @@ static Texture2D bullet_texture;
 static Texture2D coin_texture;
 static Texture2D boom_texture;
 static Texture2D bg_texture;
+static Sound shoot_sound;
+static Sound coin_sound;
+static Sound boom_sound;
+static Sound die_sound;
+static Sound reset_sound;
+static Music game_music;
 static World world = {.width=WIDTH, .height=HEIGHT};
 static Player player = {0};
 static Baddie baddies[BADDIE_N] = {0};
@@ -73,12 +79,23 @@ int main(void) {
     InitWindow(WIDTH * SCALE, HEIGHT * SCALE, "Gun Room");
     SetWindowMinSize(WIDTH, HEIGHT);
 
+    InitAudioDevice();
+
     player_texture = LoadTexture("content/sprites/gunner.png");
     baddie_texture = LoadTexture("content/sprites/baddie.png");
     bullet_texture = LoadTexture("content/sprites/bullet.png");
     coin_texture = LoadTexture("content/sprites/coin.png");
     boom_texture = LoadTexture("content/sprites/boom.png");
     bg_texture = LoadTexture("content/sprites/grid.png");
+
+    shoot_sound = LoadSound("content/sounds/shoot.wav");
+    coin_sound = LoadSound("content/sounds/coin.wav");
+    boom_sound = LoadSound("content/sounds/boom.wav");
+    die_sound = LoadSound("content/sounds/die.wav");
+    reset_sound = LoadSound("content/sounds/reset.wav");
+
+    game_music = LoadMusicStream("content/sounds/music.mp3");
+    PlayMusicStream(game_music);
 
     init();
     while (!WindowShouldClose()) {
@@ -87,14 +104,18 @@ int main(void) {
         else if (red_alpha > 0)
             red_alpha -= RED_ALPHA_SPEED * GetFrameTime();
 
-        if (IsKeyPressed(KEY_R))
+        if (IsKeyPressed(KEY_R)) {
+            PlaySound(reset_sound);
             init();
+        }
 
         sprintf(score_text, "%d", score);
 
         shake_amount = approach(shake_amount, 0, SHAKE_DECEL * GetFrameTime());
         float angle = (rand() % 360) * DEG2RAD;
         cam_pos = Vector2Rotate((Vector2) {shake_amount}, angle);
+
+        UpdateMusicStream(game_music);
 
         draw();
     }
@@ -165,8 +186,10 @@ void update() {
     update_booms(booms, dt);
     update_dead_baddies(dead_baddies, dt);
 
-    if (player.is_shooting)
+    if (player.is_shooting) {
         add_bullet(bullets, player.pos, player.angle);
+        PlaySound(shoot_sound);
+    }
 
     if (is_touching(player.pos, coin.pos)) {
         move_coin(&coin, player.pos);
@@ -175,6 +198,8 @@ void update() {
         score++;
         player_get_coin(&player);
         shake_amount = SHAKE_SMALL;
+
+        PlaySound(coin_sound);
 
         for (int i = 0; i < (int) baddies_to_spawn; i++)
             add_baddie(baddies, player.pos);
@@ -195,6 +220,7 @@ void update() {
                 add_boom(booms, baddie->pos);
                 add_dead_baddie(dead_baddies, baddie->pos, player.pos);
                 shake_amount = SHAKE_SMALL;
+                PlaySound(boom_sound);
             }
         }
     }
@@ -206,6 +232,7 @@ void update() {
             player.frame = 2;
             player.scale = 1;
             shake_amount = SHAKE_BIG;
+            PlaySound(die_sound);
             return;
         }
     }
@@ -293,6 +320,16 @@ void unload() {
     UnloadTexture(coin_texture);
     UnloadTexture(boom_texture);
     UnloadTexture(bg_texture);
+
+    UnloadSound(shoot_sound);
+    UnloadSound(coin_sound);
+    UnloadSound(boom_sound);
+    UnloadSound(die_sound);
+    UnloadSound(reset_sound);
+
+    UnloadMusicStream(game_music);
+
+    CloseAudioDevice();
 }
 
 void scaled_draw(Texture2D texture, Rectangle src_rect, Vector2 pos, float angle, float scale) {
