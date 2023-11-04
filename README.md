@@ -11,12 +11,13 @@ Get the raylib submodule:
 git submodule update --init --recursive
 ```
 
-Build the project:
+Build and run the game:
 ```shell
 mkdir build
 cd build
 cmake ..
 make
+./gun_room
 ```
 
 Read raylib's [Installing and building raylib on multiple platforms](https://github.com/raysan5/raylib#installing-and-building-raylib-on-multiple-platforms) instructions if you are missing any libraries.
